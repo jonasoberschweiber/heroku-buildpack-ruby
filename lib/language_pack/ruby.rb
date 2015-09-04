@@ -57,7 +57,8 @@ class LanguagePack::Ruby < LanguagePack::Base
   def default_config_vars
     instrument "ruby.default_config_vars" do
       vars = {
-        "LANG" => env("LANG") || "en_US.UTF-8"
+        "LANG" => env("LANG") || "en_US.UTF-8",
+        "LD_LIBRARY_PATH" => "vendor/freetds/lib:$LD_LIBRARY_PATH"
       }
 
       ruby_version.jruby? ? vars.merge({
@@ -109,6 +110,7 @@ private
     # breaking require. This only applies to Ruby 1.9.2 and 1.8.7.
     safe_binstubs = binstubs_relative_paths - ["bin"]
     paths         = [
+      "$HOME/vendor/freetds/bin",
       ENV["PATH"],
       "bin",
       system_paths,
@@ -287,6 +289,7 @@ SHELL
       set_env_default  "LANG",     "en_US.UTF-8"
       set_env_override "GEM_PATH", "$HOME/#{slug_vendor_base}:$GEM_PATH"
       set_env_override "PATH",     binstubs_relative_paths.map {|path| "$HOME/#{path}" }.join(":") + ":$PATH"
+      set_env_override "LD_LIBRARY_PATH", "vendor/freetds/lib:$LD_LIBRARY_PATH"
 
       add_to_profiled set_default_web_concurrency if env("SENSIBLE_DEFAULTS")
 
